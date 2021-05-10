@@ -26,6 +26,7 @@ doStuff()
 
 // Because those cases can cause unexpected results, we'll keep on using
 // semicolons in this guide.
+// Typically, though, I won't use them unless necessary.
 
 ///////////////////////////////////
 // 1. Numbers, Strings and Operators

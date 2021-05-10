@@ -2,7 +2,7 @@
 
 Learning Physics through coding!
 
-1. The Basics of Javascript
+1. The Basics of Javascript - The tools you need to build awesome programs.  After this, it's 90% just putting Lego's together!
 
 Special thanks to:
 

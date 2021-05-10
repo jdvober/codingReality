@@ -346,7 +346,7 @@ const words = "Joe";
 
 whisper( words ); // "joe"
 whisper( "Joe WHO?" ); // "joe who?"
-yell( words + " MAMA!" ); // = "JOE MAMA!"
+yell( words + " MAMA!" ); // "JOE MAMA!"
 
 function congratulate () {
 	const newWords = "Nice one"

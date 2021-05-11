@@ -191,6 +191,7 @@ myArray0.splice( 2, 4, "hi", "wr", "ld" ); // = ["js",12,56,90]
 
 // Sometimes we want to reference a value based on a keyword, instaed of it's position in a list.  In this case, we should use an `object` instead of an array.
 // Objects are unordered lists of key-value pairs
+// You can think of an object like a dictionary.  You look up some work, and it has a definition that goes with it.  The definition can be basically anything; numbers, strings, arrays, even other objects!
 // You denote an object by using curly braces {}
 const myObj = { key1: "Hello", key2: "World" };
 

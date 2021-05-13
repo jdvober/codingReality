@@ -10,8 +10,6 @@ let squareY = 500;
 let squareW = 20;
 let squareH = 20;
 
-let squareColorBorder = "black";
-
 let score = -1;
 let highscore = 0;
 
@@ -31,7 +29,7 @@ function setup () {
 	// Values that are calculated only once, at the beginning
 	//
 	frameRate( 240 ) // Quadruple the normal framerate for smoother gameplay
-	createCanvas( windowWidth, windowHeight );
+	createCanvas( windowWidth, windowHeight ); // Create the area where we will draw the graphics
 	noCursor() // Gets rid of the mouse cursor
 
 	// Make random walls
@@ -43,7 +41,7 @@ function setup () {
 }
 
 function draw () {
-	circleRadius = 10 + ( ( frameCount - startingFrame ) / 25 )
+	circleRadius = 10 + ( ( frameCount - startingFrame ) / 25 ) // a dynamic radius that grows over time, thus making it harder to stay away the longer the round goes on.
 	background( bgColor );
 	// Check if they are colliding
 	const squareCenterX = squareX + ( squareW / 2 )
@@ -52,6 +50,7 @@ function draw () {
 	const centerToCenterDist = dist( circleX, circleY, squareCenterX, squareCenterY )
 
 
+	// Check collision for each wallObj, and display them with their latest state
 	for ( i = 0; i < numWalls; i++ ) {
 		walls[ i ].disp();
 		walls[ i ].collideCircle();
@@ -66,6 +65,7 @@ function draw () {
 		circleMultiplier = 1
 	}
 
+	// Decay movement slowdown for square
 	squareControlsReversedTimeRemaining = squareControlsReversedTimeRemaining - ( 1 / frameRate() )
 	if ( squareControlsReversedTimeRemaining >= 0 ) {
 		SquareMultiplier = 1 - ( squareControlsReversedTimeRemaining )
@@ -74,39 +74,40 @@ function draw () {
 		squareDirection = 1
 	}
 
+	// Check if there has been a Tag
 	const tag = collideRectCircle( squareX, squareY, squareW, squareH, circleX, circleY, circleRadius );
 
-	// Red background on hit
+	// Red background on tag
 	if ( tag === true ) {
 		bgColor = "#6f1a07";
 		circleMultiplier = 0
 		squareMultiplier = 0
-		resetGame()
+		resetGame() // start a new round after a successful tag
 	} else {
 		bgColor = "gray";
 		score++;
 	}
 
-	// Fill square rgb based on position of X and Y of circle
+	// Fill square rgb based on position of X and Y of circle.  The closer the opponent, the more red.  The further away, the more green.
 	fill( map( centerToCenterDist, 0, sqrt( width ** 2 + height ** 2 ), 255, 0 ), map( centerToCenterDist, 0, sqrt( width ** 2 + height ** 2 ), 0, 255 ), 8 - ( centerToCenterDist / 8 ) );
-	stroke( squareColorBorder );
+	stroke( "black" );
 	strokeWeight( 2 );
 	rect( squareX, squareY, squareW, squareH );
 
 	stroke( "black" );
 	strokeWeight( 1.5 );
 
-	// Fill circle based on time remaining of slowdown
+	// Fill circle based on time remaining of slowdown.  Lots of slowdown time remaining -> red, top speed -> green
 	frameCount < 1 ? fill( 0, 128, 0 ) : fill( map( circleWallCollideTimeRemaining, 0, 1.25, 0, 255 ), map( circleWallCollideTimeRemaining, 0, 1.25, 255, 0 ), map( circleWallCollideTimeRemaining, 0, 1.25, 8, 0 ) );
 	circle( circleX, circleY, circleRadius );
 
 	// How to move the circle with WASD
-	//D = 68 -> right
+	// D = 68 -> right
 	if ( keyIsDown( 68 ) && circleX + circleRadius + 5 <= width ) {
 		circleX = circleX + ( 10 * circleMultiplier );
 	}
 
-	//A = 65 -> left
+	// A = 65 -> left
 	if ( keyIsDown( 65 ) && circleX - circleRadius >= 5 ) {
 		circleX = circleX - ( 10 * circleMultiplier );
 	}
@@ -121,13 +122,14 @@ function draw () {
 		circleY = circleY + ( 10 * circleMultiplier );
 	}
 
-	// How to move the square with arrows
+	// How to move the square with arrow keys
 	if ( keyIsDown( RIGHT_ARROW ) ) {
 		let nextFrameSquareX = squareX + ( 12 * squareMultiplier * squareDirection )
 		if ( width > nextFrameSquareX && nextFrameSquareX > 0 ) {
 			squareX = nextFrameSquareX;
 		}
 	}
+
 	if ( keyIsDown( LEFT_ARROW ) ) {
 		let nextFrameSquareX = squareX - ( 12 * squareMultiplier * squareDirection )
 		if ( width > nextFrameSquareX && nextFrameSquareX > 0 ) {
@@ -135,12 +137,14 @@ function draw () {
 		}
 
 	}
+
 	if ( keyIsDown( UP_ARROW ) ) {
 		let nextFrameSquareY = squareY - ( 12 * squareMultiplier * squareDirection )
 		if ( height > nextFrameSquareY && nextFrameSquareY > 0 ) {
 			squareY = nextFrameSquareY;
 		}
 	}
+
 	if ( keyIsDown( DOWN_ARROW ) ) {
 		let nextFrameSquareY = squareY + ( 12 * squareMultiplier * squareDirection )
 		if ( height > nextFrameSquareY && nextFrameSquareY > 0 ) {
@@ -157,10 +161,12 @@ function draw () {
 }
 
 function wallObj ( x, y, w, h ) {
+	// Position and dimensions
 	this.x = x
 	this.y = y
 	this.w = w
 	this.h = h
+	// Random Color
 	this.color = color( random( 255 ), random( 255 ), random( 255 ) )
 	this.hit = false;
 
@@ -171,6 +177,8 @@ function wallObj ( x, y, w, h ) {
 		if ( this.hitSquare ) {
 			// Set the starting frame for the slowdown
 			squareControlsReversedTimeRemaining = .125
+
+			// Shrink the size of the object
 			this.w = this.w * 0.95
 			this.h = this.h * 0.95
 		}
@@ -183,12 +191,14 @@ function wallObj ( x, y, w, h ) {
 		if ( this.hitCircle ) {
 			// Set the starting frame for the slowdown
 			circleWallCollideTimeRemaining = 1
+			// Slowly shrink the size
 			this.w = this.w * 0.99
 			this.h = this.h * 0.99
 		}
 	}
 
 	this.disp = function () {
+		// Draw the wall
 		noStroke();
 		fill( this.color );
 		rect( this.x, this.y, this.w, this.h );
@@ -204,7 +214,11 @@ function resetGame () {
 		if ( score > highscore ) {
 			highscore = score
 		}
+
+		// Note the new "starting" frame.
 		startingFrame = frameCount
+
+		// Reset variables
 		circleX = 100; // Starting pos x
 		circleY = 100; // Starting pos y
 		squareX = 1200;
@@ -221,11 +235,12 @@ function resetGame () {
 
 		circleWallCollideTimeRemaining = 0
 		squareControlsReversedTimeRemaining = 0
-		// Make random walls
+
+		// Make new random walls
 		for ( i = 0; i < numWalls; i++ ) {
 			r = new wallObj( random( width ), random( height ), random( 20, 75 ), random( 20, 75 ) ) // generate a wallObj
 			walls.push( r ); //add it to the array.
 		}
-	}, 1500 );
+	}, 1500 ); // 1.5 second pause, then reset begins
 }
 

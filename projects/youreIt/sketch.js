@@ -1,8 +1,8 @@
 // Starting values
 let bgColor = "gray";
 
-let circleX = 100; // Starting pos x
-let circleY = 100; // Starting pos y
+let circleX = 100; // Starting x pos of the circle
+let circleY = 100; // Starting y pos of the circle
 let circleRadius = 10;
 
 let squareX = 1200;
@@ -10,29 +10,29 @@ let squareY = 500;
 let squareW = 20;
 let squareH = 20;
 
-let squareColor = "green"
 let squareColorBorder = "black";
 
 let score = -1;
 let highscore = 0;
 
-let walls = []
+let walls = [] // This will hold all of our wall objects
 let numWalls = 75
 
-let circleMultiplier = 1
-let squareMultiplier = 1
-let squareDirection = 1
+let circleMultiplier = 1 // Multiplier for the slowdown when circle hits the wall
+let squareMultiplier = 1 // Multiplier for when the square hits the wall
+let squareDirection = 1 // A switch for reversing controls when a square hits a wall
 
-let circleWallCollideTimeRemaining
+let circleWallCollideTimeRemaining = 0
 let squareControlsReversedTimeRemaining = 0
 
 let startingFrame = 0
 
 function setup () {
-	frameRate( 120 )
 	// Values that are calculated only once, at the beginning
+	//
+	frameRate( 240 ) // Quadruple the normal framerate for smoother gameplay
 	createCanvas( windowWidth, windowHeight );
-	noCursor()
+	noCursor() // Gets rid of the mouse cursor
 
 	// Make random walls
 	for ( i = 0; i < numWalls; i++ ) {

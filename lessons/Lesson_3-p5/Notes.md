@@ -2,7 +2,12 @@
 
 ## What is p5.js
 
-p5.js is an add-on for Javascript that makes doing lots of graphics work (and other tasks) much easier to approach.  You can animate and interact with objects much, MUCH easier.  You can still use whatever Javascript (or other Javascript add-ons) you want in addition to p5.
+p5.js is an add-on for Javascript that makes doing lots of graphics work (and other tasks) much easier to approach.
+You can animate and interact with objects much, MUCH easier.  You can still use whatever Javascript (or other Javascript add-ons) you want in addition to p5.
+
+The creators of p5 describe it as follows:
+
+> p5.js is a JavaScript library for creative coding, with a focus on making coding accessible and inclusive for artists, designers, educators, beginners, and anyone else!
 
 ## Using p5.js
 

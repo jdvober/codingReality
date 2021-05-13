@@ -103,28 +103,47 @@ function draw () {
 
 	// How to move the circle with WASD
 	// D = 68 -> right
-	if ( keyIsDown( 68 ) && circleX + circleRadius + 5 <= width ) {
-		circleX = circleX + ( 10 * circleMultiplier );
+	if ( keyIsDown( 68 ) ) {
+		// Make sure
+		if ( circleX + circleRadius / 2 + ( 10 * circleMultiplier ) < width ) {
+			circleX = circleX + ( 10 * circleMultiplier );
+		} else {
+			circleX = width - circleRadius / 2
+		}
 	}
 
 	// A = 65 -> left
-	if ( keyIsDown( 65 ) && circleX - circleRadius >= 5 ) {
-		circleX = circleX - ( 10 * circleMultiplier );
+	if ( keyIsDown( 65 ) ) {
+		if ( circleX - circleRadius / 2 - ( 10 * circleMultiplier ) > 0 ) {
+			circleX = circleX - ( 10 * circleMultiplier );
+		} else {
+			circleX = circleRadius / 2
+		}
+
 	}
 
 	// W = 87 -> up
-	if ( keyIsDown( 87 ) && circleY - circleRadius >= 5 ) {
-		circleY = circleY - ( 10 * circleMultiplier );
+	if ( keyIsDown( 87 ) ) {
+		if ( circleY - circleRadius / 2 - ( 10 * circleMultiplier ) > 0 ) {
+			circleY = circleY - ( 10 * circleMultiplier );
+		} else {
+			circleY = circleRadius / 2
+		}
+
 	}
 
 	// S = 83 -> down
-	if ( keyIsDown( 83 ) && circleY + circleRadius + 5 <= height ) {
-		circleY = circleY + ( 10 * circleMultiplier );
+	if ( keyIsDown( 83 ) ) {
+		if ( circleY + circleRadius / 2 + ( 10 * circleMultiplier ) < height ) {
+			circleY = circleY + ( 10 * circleMultiplier );
+		}
 	}
 
 	// How to move the square with arrow keys
 	if ( keyIsDown( RIGHT_ARROW ) ) {
+		// Check to see where the square will be next frame
 		let nextFrameSquareX = squareX + ( 12 * squareMultiplier * squareDirection )
+		// Check to see if the square will be out of bounds next frame, and only update position if it will still be in play
 		if ( width > nextFrameSquareX && nextFrameSquareX > 0 ) {
 			squareX = nextFrameSquareX;
 		}

@@ -10,8 +10,8 @@ let squareY = 500;
 let squareW = 20;
 let squareH = 20;
 
-let score = -1;
-let highscore = 0;
+let time = -1;
+let bestTime = 0;
 
 let walls = [] // This will hold all of our wall objects
 let numWalls = 75
@@ -41,7 +41,8 @@ function setup () {
 }
 
 function draw () {
-	circleRadius = 10 + ( ( frameCount - startingFrame ) / 25 ) // a dynamic radius that grows over time, thus making it harder to stay away the longer the round goes on.
+	circleRadius = 10 + ( ( frameCount - startingFrame ) / 12 ) // a dynamic radius that grows over time, thus making it harder to stay away the longer the round goes on.
+	// circleRadius = 10 + ( ( frameCount - startingFrame ) / 25 ) // a dynamic radius that grows over time, thus making it harder to stay away the longer the round goes on.
 	background( bgColor );
 	// Check if they are colliding
 	const squareCenterX = squareX + ( squareW / 2 )
@@ -60,7 +61,7 @@ function draw () {
 	// Decay movement slowdown for circle
 	circleWallCollideTimeRemaining = circleWallCollideTimeRemaining - ( 1 / frameRate() )
 	if ( circleWallCollideTimeRemaining >= 0 ) {
-		circleMultiplier = map( circleWallCollideTimeRemaining, 1, 0, 0.15, 1 )
+		circleMultiplier = map( circleWallCollideTimeRemaining, 1, 0, 0.05, 1 )
 	} else {
 		circleMultiplier = 1
 	}
@@ -68,10 +69,11 @@ function draw () {
 	// Decay movement slowdown for square
 	squareControlsReversedTimeRemaining = squareControlsReversedTimeRemaining - ( 1 / frameRate() )
 	if ( squareControlsReversedTimeRemaining >= 0 ) {
-		SquareMultiplier = 1 - ( squareControlsReversedTimeRemaining )
+		SquareMultiplier = map( squareControlsReversedTimeRemaining, 1, 0, 0.15, 1 )
 		squareDirection = -1
 	} else {
 		squareDirection = 1
+		squareMultiplier = 1
 	}
 
 	// Check if there has been a Tag
@@ -85,12 +87,12 @@ function draw () {
 		resetGame() // start a new round after a successful tag
 	} else {
 		bgColor = "gray";
-		score++;
+		time++;
 	}
 
 	// Fill square rgb based on position of X and Y of circle.  The closer the opponent, the more red.  The further away, the more green.
 	fill( map( centerToCenterDist, 0, sqrt( width ** 2 + height ** 2 ), 255, 0 ), map( centerToCenterDist, 0, sqrt( width ** 2 + height ** 2 ), 0, 255 ), 8 - ( centerToCenterDist / 8 ) );
-	stroke( "black" );
+	stroke( `${ squareControlsReversedTimeRemaining > 0 ? "red" : "green" }` );
 	strokeWeight( 2 );
 	rect( squareX, squareY, squareW, squareH );
 
@@ -174,9 +176,11 @@ function draw () {
 	// Show score / high score last, so it is always on top
 	textSize( 64 );
 	fill( 255, 255, 255 )
-	text( `Score: ${ score }`, width - textWidth( score ) - 205, 64 );
+	textAlign( RIGHT )
+	text( `Time: ${ ( time / 100 ).toFixed( 2 ) }s`, width - 26, 64 );
+	textAlign( LEFT )
 	textSize( 32 );
-	text( `High Score: ${ highscore }`, textWidth( highscore ) - 10, 32 );
+	text( `Best Time: ${ bestTime / 100 } seconds`, textWidth( bestTime ) - 10, 32 );
 }
 
 function wallObj ( x, y, w, h ) {
@@ -191,30 +195,71 @@ function wallObj ( x, y, w, h ) {
 
 	this.collideSquare = function () {
 
+		// Remove from the field
+		if ( this.w < 8 || this.h < 8 ) {
+			this.w = 0
+			this.h = 0
+			this.hit = false
+			return
+		}
 		this.hitSquare = collideRectRect( this.x, this.y, this.w, this.h, squareX, squareY, squareW, squareH );
 
 		if ( this.hitSquare ) {
 			// Set the starting frame for the slowdown
-			squareControlsReversedTimeRemaining = .125
+			squareControlsReversedTimeRemaining = .75
 
 			// Shrink the size of the object
-			this.w = this.w * 0.95
-			this.h = this.h * 0.95
+			let shrinkX = this.w * 1.01
+			let shrinkY = this.h * 1.01
+			// this.w = shrinkX
+			// this.h = shrinkY
+			if ( squareX < this.x ) {
+				this.x = this.x + shrinkX / 16
+			}
+			if ( this.x < squareX ) {
+				this.x = this.x - shrinkX / 16
+			}
+			if ( squareY > this.y ) {
+				this.y = this.y - shrinkY / 16
+			}
+			if ( this.y > squareY ) {
+				this.y = this.y + shrinkY / 16
+			}
 		}
 	}
 
 	this.collideCircle = function () {
 
+		// Remove from the field
+		if ( this.w < 8 || this.h < 8 ) {
+			this.w = 0
+			this.h = 0
+			this.hit = false
+			return
+		}
 		this.hitCircle = collideRectCircle( this.x, this.y, this.w, this.h, circleX, circleY, circleRadius );
 
 		if ( this.hitCircle ) {
 			// Set the starting frame for the slowdown
 			circleWallCollideTimeRemaining = 1
 			// Slowly shrink the size
-			this.w = this.w * 0.99
-			this.h = this.h * 0.99
+			let shrinkX = this.w * 0.99
+			let shrinkY = this.h * 0.99
+			this.w = this.w - ( circleRadius * 0.0375 )
+			this.h = this.h - ( circleRadius * 0.0375 )
+			if ( circleX < this.x ) {
+				this.x = this.x + ( circleRadius / frameRate() ) + shrinkX / frameRate()
+			} else {
+				this.x = this.x - ( circleRadius / frameRate() ) - shrinkX / frameRate()
+			}
+			if ( circleY < this.y ) {
+				this.y = this.y + ( circleRadius / frameRate() ) + shrinkY / frameRate()
+			} else {
+				this.y = this.y - ( circleRadius / frameRate() ) - shrinkY / frameRate()
+			}
 		}
 	}
+
 
 	this.disp = function () {
 		// Draw the wall
@@ -230,8 +275,8 @@ function resetGame () {
 	// Pause for a hot second, then start a new round
 	setTimeout( () => {
 
-		if ( score > highscore ) {
-			highscore = score
+		if ( time > bestTime ) {
+			bestTime = time
 		}
 
 		// Note the new "starting" frame.
@@ -242,7 +287,7 @@ function resetGame () {
 		circleY = 100; // Starting pos y
 		squareX = 1200;
 		squareY = 500;
-		score = -1;
+		time = -1;
 
 
 		walls = []
